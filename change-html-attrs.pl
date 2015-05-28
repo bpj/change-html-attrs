@@ -108,7 +108,7 @@ sub build_params {    # {{{1}}}
                 for my $data ( $param->{$key} ) {
                     HREF eq ref $data or $data = +{ $attr => $data };
                 }
-            } ## end for my $key_attr ( @DEFAULT_ATTRS)
+            } ## end for my $key_attr ( @default_attrs)
           FROM:
             for my $key ( keys %{ $param->{from} } ) {
                 for my $val ( $param->{from}{$key} ) {
@@ -117,6 +117,16 @@ sub build_params {    # {{{1}}}
                     $val = qr/(?$mods:$val)/;
                 }
             } ## end FROM: for my $key ( keys %{ $param...})
+          TO:
+            for my $to ( $param->{to} ) {
+                next unless $to->{CALL};
+                for my $calls ( $to->{CALL} ) {
+                    AREF eq ref $calls or $calls = [$calls];
+                    for my $call ( @$calls ) {
+                        AREF eq ref $call or $call = [$call];
+                    }
+                } ## end for my $calls ( $to->{CALL...})
+            } ## end TO: for my $to ( $param->{to...})
         } ## end for my $param ( @$params)
     } ## end for my $params ( @{$self...})
     return 1;
@@ -151,8 +161,10 @@ sub find_styles {                               # {{{1}}}
         FROM:
         for my $from ( $params->{from} ) {
             while ( my ( $attr, $val ) = each %$from ) {
-                $val = qr/^\Q$val\E$/ unless ref $val;
-                @found = grep { $_->{$attr} =~ $val } @found;
+                @found = grep { 
+                    !defined($val) && !exists($_->{$attr})
+                        or $_->{$attr} =~ $val 
+                } @found;
                 last FROM unless @found;
             }
         }
@@ -208,6 +220,16 @@ sub change {                                    # {{{1}}}
                     @elems or next PARAM;
                   ELEM:
                     for my $elem ( @elems ) {
+                        CALLS:
+                        if ( my $calls = $to->{CALL} ) {
+                            CALL:
+                            for my $call ( @$calls ) {
+                                my( $method, @args ) = @$call;
+                                next CALL unless $method;
+                                $elem->$method( @args );
+                            }
+                        }
+                        delete local $to->{CALL};
                       ATTR:
                         while ( my ( $attr => $val ) = each %$to ) {
                             $elem->attr( $attr => $val );
@@ -259,20 +281,33 @@ change-html-attrs.pl - change tags and attributes of elements based on their tag
 `change-html-attrs.pl` is a perl script which changes tags and
 attributes of HTML elements based on their tags and elements.
 
-It is especially useful for correcting automatically generated (X)HTML
-as output by e.g. by the XHTML export filter of LibreOffice,
-which uses `<span>` elements with classes and a corresponding
-embedded CSS stylesheet with styles like `.T2 { font-style:italic; }`
-rather than `<em>` elements.  I have been told (I'm on Linux) that Apple's TextUtil,
-at least when converting from RTF to HTML even replaces headers with
-styled `<p>` elements! Clearly these tools reflect the way the data
-are represented in the original format, whether ODF XML or RTF too
-shallowly.
-
 The script reads a YAML configuration file, then an HTML file,
 passed either as a filename or to *stdin*, modifies HTML elements
 based on criteria in the configuration file, converts the content
 back to HTML and writes it to *stdout*.
+
+It is especially useful for correcting automatically generated
+(X)HTML as output by e.g. by the XHTML export filter of
+LibreOffice, which uses `<span>` elements with classes and a
+corresponding embedded CSS stylesheet with styles like
+`.T2 { font-style:italic; }` rather than `<em>` elements. I have
+been told (I'm on Linux) that Apple's TextUtil, at least when
+converting from RTF to HTML even replaces headers with styled
+`<p>` elements! Clearly these tools reflect the way the data are
+represented in the original format, whether ODF XML or RTF too
+shallowly.
+
+Unfortunately the correspondence between class names and styles
+generated automatically by LibreOffice or an RTF writer is not
+constant, so one time you may get `.T2 { font-style:italic; }`
+and another time you get `.T5 { font-style:italic; }` or some
+other random, auto-generated class name for what should be an
+`<em>` element. To work around this you can use CSS property
+names and values as search criteria, and if the HTML file
+contains any `<style>` elements these will be analysed to
+identify classes, ids and/or tags corresponding to the specified
+CSS attributes and matching elements will be modified
+accordingly.
 
 # USAGE
 
@@ -286,25 +321,193 @@ The script takes one or two commandline arguments:
     If the second argument is missing the HTML is read from *stdin*.
 
     **WARNING:**
-    :   If the HTML is not UTF-8 encoded you *must* pass a filename, and charset
-        information must be present in the content attribute of a
+    :   If the HTML is not UTF-8 encoded you *must* pass a filename,
+        as second argument and charset information must be
+        present in the content attribute of a
         `<meta http-equiv="Content-Type"` tag in a possibly
         incomplete HTML document, which will be looked up using
         the "two step" algorithm specified by HTML5. It does not
         look for a BOM. Only the first 1024 bytes of the string
         are checked.
 
-Unfortunately the correspondence between class names and styles
-generated automatically by LibreOffice or an RTF writer is not
-constant, so one time you may get `.T2 { font-style:italic; }`
-and another time you get `.T5 { font-style:italic; }` or some
-other random, auto-generated class name for what should be an
-`<em>` element. Thus you must visually inspect the style sheet of
-every HTML file and write/modify an appropriate configuration
-file. It is on my TODO list to make the script analyse the
-embedded stylesheet to identify class-to-style correspondances,
-although that is currently not yet implemented.
+The modified document will be converted back to HTML and written to *stdout* in UTF-8 encoding.
 
+# The YAML configuration file
+
+The YAML configuration file should look something like this:
+
+```
+---
+for_styles:
+# Inline code
+- from:   # Search criteria
+    class: '/^T\d+$'          # Leading / indicates regular expression
+    font-family: '/Courier'
+  to:     # replacement values
+    _tag: code
+    class: ~      # Undefined replacement value: delete the attribute
+- from:
+    class: '/^T\d+$'
+    font-style: '/italic'
+  to:
+    _tag: em
+- from:
+    class: '/^T\d+$'
+    font-weight: '/bold'
+  to:
+    _tag: strong
+# Block code
+- from:
+    margin-top: '/\S'
+    font-family: '/Courier'
+  to:
+    _tag: pre
+    class: ~
+
+for_elements:
+# Delete A elements without an href attribute
+- from:
+    _tag: a
+    href: ~     # Undefined search value: the attribute must not exist
+  to:
+    CALL: delete    # Call a method on the HTML::Element object!
+# Delete classes from header elements
+- from:
+    _tag: '/^h[1-6]$'
+  to:
+    class: ~
+```
+
+For the supported subset of YAML syntax see
+<https://metacpan.org/pod/YAML::Tiny#YAML-TINY-SPECIFICATION>
+
+The structure of the configuration file should be as follows:
+
+*   The top level is a mapping with at least one of the keys
+    `for_styles:` and `for_elements`, each with a list as value.
+    If the top level is a list it is assigned to `for_elements:`
+
+*   Each of the values of `for_styles:` and `for_elements` is a
+    list of mappings with two keys `from:` (the search
+    criteria) and `to:` (the replacement values), each with a
+    mapping as value.
+
+*   The `from:` mapping of the `for_elements:` list items have
+    HTML attribute names as keys and plain strings or strings containing
+    Perl regular expressions, or as explicitly undefined values specified with
+    `~`, e.g. `href: ~`. 
+    
+    Regular expressions are entered as normalstrings and
+    identified as regexes by a leading
+    forward slash and an optional trailing slash followed by
+    regular expression modifier letters: `/REGEX/MODIFIERS`, e.g.
+    `/^P\d+$/i` which matches a string consisting of a `P` or
+    `p` followed by one or more digits, `/^P\d+$/` being the
+    format of an automatical paragraph style class in the output
+    of LibreOffice's XHTML exporter. Note that strings containing
+    regular expressions
+    should normally be enclosed in single quotes to prevent that
+    punctuation characters inside them are interpreted as YAML metacharacters.
+    
+    If you are unfamiliar with
+    regular expressions in general or Perl regular expressions
+    in particular you can find increasingly in-depth information
+    with the `perldoc` command line program:
+
+        $ perldoc perlrequick
+
+        $ perldoc perlretut
+
+        $ perldoc perlre
+
+    For the valid trailing modifiers see:
+
+        $ perldoc -f qr
+
+*   The search criteria select all elements where all the criteria
+    in the `from:` mapping match the corresponding HTML attributes:
+
+    ```
+    from:
+        _tag:   span
+        class:  '/\bfoo\b/'
+    ```
+
+    selects all `<span>` elements with a class `foo`.  Non-span elements
+        or elements without a `foo` class are not selected.
+
+    The following rules apply for attribute value matching
+
+    Plain strings
+    ~   Must match exactly, i.e. the attribute value must be that exact string.
+
+    Regular expressions
+    ~   The attribute value must match the regular expression.
+        If you don't want to match a substring use the beginning-of-string
+        and end-of-string anchors `^` and `$`.
+
+    Undefined search criterion values
+    ~   The attribute must not be present in the element; thus `href: ~`
+        will match elements without any `href` attribute.
+
+        Note that there is a subtle difference between an undefined value
+            and an empty string as search criterion values: the empty string
+        will select elements where the value of the attribute in question
+        *is* an empty string, while an undefined value will select elements
+        where the attribute in question is missing.
+
+    The key `_tag:`
+    ~   The search criterion key `_tag:`, with a leading underscore,
+        matches the *element attribute name* rather than an attribute.
+        Thus `_tag: span` will select `<span>` elements.
+
+    Classes
+    ~   Remember that classes are stored in a single string separated by whitespace.
+        To match a single class enclose use a regular expressionand enclose the 
+        class name with `\b` anchors, or if the element
+        should have only a single class with `^` and `$` anchors.
+
+*   The `from:` mappings of the `for_styles:` section are similar,
+    except that
+
+    1.  You can use CSS attribute names and values as search criteria.
+        Thus for example `font-family: '/Courier'` will match elements
+        to which a style rule specifying Courier or Courier New as font-family apply.
+
+    2.  The only HTML attributes you can match are `id`, `class` and the
+        element-name 'attribute' `_tag`, namely as inferred from the CSS selectors,
+        which are matched against the following regular expressions:
+
+            _tag  : /(?<!\S)([-\w]+)/
+            id    : /\#([-\w]+)/
+            class : /\.([-\w]+)/
+
+    **NOTE:**
+    ~   Style matching works by matching the `from:` criteria of the `for_styles`
+        section against CSS style rules embedded in the HTML document and constructing
+        `for_elements` criteria based on their selectors.
+
+    ~   Child selectors like `p.foo span.bar` do not work. Such
+        rules are simply ignored. Comma-separated selectors like
+        `p.foo, span.bar` *do* work, but all other selectors
+        containing whitespace are ignored.
+
+*   `to:` mappings simply specify string attribute values which should replace the old
+    attribute values -- or the element name; the `_tag` 'attribute' is supported!
+
+    The exception is the key `CALL:` (note the upper case!): its value should be
+    a list of lists, where the first item of the inner lists should be the name
+    of an [](cpan:HTML::Element) method to call on the object representing the
+    element and the following items are arguments to the method if any. 
+    As a special shortcut you can give a single method name like `CALL: delete`
+    instead of a list of lists.  Please note that this feature has not been
+    extensively tested: the only forms I have ever actually used are
+    `CALL: delete` and `CALL: replace_with_content`! These are arguably the
+    most useful ones. A way to call `replace_with` in a meaningful way,
+    where you can insert a clone of the original method or its content list,
+    is on the TODO list.
+
+        
 # AUTHOR
 
 Benct Philip Jonsson \<bpjonsson\@gmail.com\>
