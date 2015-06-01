@@ -1,0 +1,84 @@
+###################################################
+# Replace spans and some paras with semantic tags #
+###################################################
+
+for_styles:
+  # Inline code
+  - from:   # Search criteria
+      class: '/^T\d+$'          # Leading / indicates regular expression
+      font-family: '/Courier'
+    to:     # replacement values
+      _tag: code
+      # Undefined replacement value: delete the attribute
+      class: ~      
+  - from:
+      class: '/^T\d+$'
+      font-style: '/italic'
+    to:
+      _tag: em
+  - from:
+      class: '/^T\d+$'
+      font-style: '/bold'
+    to:
+      _tag: strong
+  # Block code
+  - from:
+      margin-top: '/\S'
+      font-family: '/Courier'
+    to:
+      _tag: pre
+      class: ~
+
+
+#################
+## Delete junk ##
+#################
+
+for_elements:
+  # Make the HTML more readable
+  - from:
+      _tag: '/\S'
+    to:
+      style: ~
+  - from:
+      _tag: p
+    to:
+      class: ~
+  # Delete classes from header elements
+  - from:
+      _tag: '/^h[1-6]$'
+    to:
+      class: ~
+  # Clean up link texts
+  - from:
+      _tag:  span
+      class: Definition
+    to:
+      CALL: replace_with_content
+  # Bullets
+  - from:
+      _tag: span
+      class: Bullet_20_Symbols
+    to:
+      CALL: replace_with_content
+  # ODF end-of-line thingos
+  - from:
+      _tag:  span
+      class: odfLiEnd
+    to:
+      CALL: delete
+  # Delete SPAN elements with list numbers
+  # The list will be OK in normal HTML
+  - from:
+      _tag: span
+      # Undefined search value: the attribute must be nonexisting
+      class: Numbering_20_Symbols    
+    to:
+      CALL: delete    # Call  # Delete A elements without an href attribute
+  - from:
+      _tag: a
+      # Undefined search value: the attribute must be nonexisting
+      href: ~     
+    to:
+      CALL: delete    # Call a method on the HTML::Element object!
+

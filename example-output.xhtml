@@ -1,0 +1,174 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1 plus MathML 2.0//EN" "http://www.w3.org/Math/DTD/mathml2/xhtml-math11-f.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head profile="http://dublincore.org/documents/dcmi-terms/">
+    <meta content="application/xhtml+xml; charset=utf-8" http-equiv="Content-Type" />
+    <title xml:lang="en-US">
+    </title>
+    <meta content="" name="DCTERMS.title" xml:lang="en-US" />
+    <meta content="en-US" name="DCTERMS.language" scheme="DCTERMS.RFC4646" />
+    <meta content="http://xml.openoffice.org/odf2xhtml" name="DCTERMS.source" />
+    <meta content="" name="DCTERMS.provenance" xml:lang="en-US" />
+    <meta content="," name="DCTERMS.subject" xml:lang="en-US" />
+    <link href="http://purl.org/dc/elements/1.1/" hreflang="en" rel="schema.DC" />
+    <link href="http://purl.org/dc/terms/" hreflang="en" rel="schema.DCTERMS" />
+    <link href="http://purl.org/dc/dcmitype/" hreflang="en" rel="schema.DCTYPE" />
+    <link href="http://purl.org/dc/dcam/" hreflang="en" rel="schema.DCAM" />
+    <style type="text/css">
+	@page {  }
+	table { border-collapse:collapse; border-spacing:0; empty-cells:show }
+	td, th { vertical-align:top; font-size:12pt;}
+	h1, h2, h3, h4, h5, h6 { clear:both }
+	ol, ul { margin:0; padding:0;}
+	li { list-style: none; margin:0; padding:0;}
+	<!-- "li span.odfLiEnd" - IE 7 issue-->
+	li span. { clear: both; line-height:0; width:0; height:0; margin:0; padding:0; }
+	span.footnodeNumber { padding-right:1em; }
+	span.annotation_style_by_filter { font-size:95%; font-family:Arial; background-color:#fff000;  margin:0; border:0; padding:0;  }
+	* { margin:0;}
+	.First_20_paragraph { font-size:12pt; font-family:Times New Roman; writing-mode:page; }
+	.Heading_20_1 { font-size:115%; margin-bottom:0.212cm; margin-top:0.423cm; font-family:Arial; writing-mode:page; font-weight:bold; }
+	.Heading_20_2 { font-size:14pt; margin-bottom:0.212cm; margin-top:0.423cm; font-family:Arial; writing-mode:page; font-style:italic; font-weight:bold; }
+	.Heading_20_3 { font-size:14pt; margin-bottom:0.212cm; margin-top:0.423cm; font-family:Arial; writing-mode:page; font-weight:bold; }
+	.Heading_20_4 { font-size:85%; margin-bottom:0.212cm; margin-top:0.423cm; font-family:Arial; writing-mode:page; font-style:italic; font-weight:bold; }
+	.P1 { font-size:12pt; font-family:Times New Roman; writing-mode:page; text-align:center ! important; }
+	.P10 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Courier New; writing-mode:page; }
+	.P11 { font-size:12pt; margin-bottom:0cm; margin-top:0cm; font-family:Times New Roman; writing-mode:page; }
+	.P12 { font-size:14pt; font-weight:bold; margin-bottom:0.212cm; margin-top:0.423cm; font-family:Courier New; writing-mode:page; }
+	.P13 { font-size:10pt; margin-bottom:0cm; margin-top:0cm; font-family:Courier New; writing-mode:page; }
+	.P3 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; }
+	.P4 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; }
+	.P5 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; font-weight:bold; }
+	.P6 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; font-weight:bold; }
+	.P7 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; }
+	.P8 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; }
+	.P9 { font-size:12pt; margin-bottom:0.152cm; margin-top:0.152cm; font-family:Times New Roman; writing-mode:page; }
+	.Preformatted_20_Text { font-size:10pt; font-family:Courier New; writing-mode:page; margin-top:0cm; margin-bottom:0cm; }
+	.Text_20_body { font-size:12pt; font-family:Times New Roman; writing-mode:page; margin-top:0.152cm; margin-bottom:0.152cm; }
+	.Bullet_20_Symbols { font-family:StarSymbol; font-size:9pt; }
+	.T1 { font-family:Courier New; }
+	.T2 { font-style:italic; }
+	<!-- ODF styles with no properties representable as CSS -->
+	.Definition .Footnote_20_Symbol .Numbering_20_Symbols  { }
+	</style>
+  </head>
+  <body dir="ltr">
+    <h1>NAME</h1>
+    <p>change-html-attrs.pl - change tags and attributes of elements based on their tags and elements</p>
+    <h1>SYNOPSIS</h1><pre>perl change-html-attrs.pl -c CONFIG-YAML [OPTIONS] [HTML-FILE...]</pre><h1>DESCRIPTION</h1>
+    <p><code>change-html-attrs.pl</code> is a perl program which changes tags and attributes of HTML elements based on their tags and elements.</p>
+    <p>The program reads a YAML configuration file, then an HTML file, passed either as a filename or to <em class="T2">stdin</em>, modifies HTML elements based on criteria in the configuration file, converts the content back to HTML and writes it to <em class="T2">stdout</em>.</p>
+    <p>It is especially useful for correcting automatically generated (X)HTML as output by e.g. by the XHTML export filter of LibreOffice, which uses <code>&lt;span&gt;</code> elements with classes and a corresponding embedded CSS stylesheet with styles like <code>.T2 { font-style:italic; }</code> rather than <code>&lt;em&gt;</code> elements. I have been told (I'm on Linux) that Apple's TextUtil, at least when converting from RTF to HTML even replaces headers with styled <code>&lt;p&gt;</code> elements! Clearly these tools reflect the way the data are represented in the original format, whether ODF XML or RTF too shallowly.</p>
+    <p>Unfortunately the correspondence between class names and styles generated automatically by LibreOffice or an RTF writer is not constant, so one time you may get <code>.T2 { font-style:italic; }</code> and another time you get <code>.T5 { font-style:italic; }</code> or some other random, auto-generated class name for what should be an <code>&lt;em&gt;</code> element. To work around this you can use CSS property names and values as search criteria, and if the HTML file contains any <code>&lt;style&gt;</code> elements these will be analysed to identify classes, ids and/or tags corresponding to the specified CSS attributes and matching elements will be modified accordingly.</p>
+    <h1>OPTIONS</h1>
+    <ul>
+      <li>
+        <p>•.<code>-c</code>, <code>-y</code>, <code>--config</code>, <code>--yaml</code> <em class="T2">FILE</em></p>
+        <p>The YAML config file to use. See <a href="#the-yaml-config-file">&quot;The YAML config file&quot;</a> for its structure. This argument is required.</p>
+      </li>
+      <li>
+        <p>•.<code>-C</code>, <code>--css</code> <em class="T2">FILE</em> (Repeatable)</p>
+        <p>A CSS stylesheet file to use for mapping CSS styles to HTML attributes, in addition to or instead of style sheet(s) embedded in the HTML file(s). This option can be given more than once for multiple files.</p>
+      </li>
+      <li>
+        <p>•.<code>-b</code>, <code>--body-only</code></p>
+        <p>Print out only the <code>&lt;body&gt;</code> of the HTML documents, with the <code>body</code> element name replaced by <code>div</code>.</p>
+        <p>When used in conjunction with <code>--modify-in-place</code> this <em class="T2">will</em> lead to loss of any information in the <code>&lt;head&gt;</code>!</p>
+      </li>
+      <li>
+        <p>•.<code>-i</code>, <code>--modify-in-place</code> [<em class="T2">.EXTENSION</em>]</p>
+        <p>Write the modified HTML back to the original file after modification. The modified content will be UTF-8 encoded regardless of the original encoding and the <code>charset</code> attribute of any <code>&lt;meta http-equiv=&quot;Content-Type&quot;&gt;</code> element will have been updated accordingly.</p>
+        <p>When <em class="T2">.EXTENSION</em> is present the original file will be backed up to a file with <em class="T2">.EXTENSION</em> added to the filename.</p>
+        <p>If possible it is recommended to keep your files in a local git repository and do the in-place modification in a fresh branch. If anything goes wrong you can do <code>git reset --hard</code> and return everything to the state before modification. When all is done and well you can merge the modification branch back into your main branch.</p>
+      </li>
+      <li>
+        <p>•.<code>-s</code>, <code>--stdout</code></p>
+        <p>If both this option and <code>--modify-in-place</code> are true modified HTML will be written to <em class="T2">stdout</em> as well as to files.</p>
+        <p>When <code>--modify-in-place</code> is false <code>--stdout</code> is implied and all output will go to <em class="T2">stdout</em>.</p>
+      </li>
+      <li>
+        <p>•.<code>-h</code>, <code>--help</code></p>
+        <p>Show the help text.</p>
+      </li>
+      <li>
+        <p>•.<code>-m</code>, <code>--man</code></p>
+        <p>Show the entire manual.</p>
+      </li>
+    </ul>
+    <h1>USAGE</h1>
+    <p>(For the format of the YAML configuration file see below!)</p>
+    <p>Apart from the <code>--config YAML_FILE</code> option which <em class="T2">must</em> be present the program takes any number of HTML file names as arguments, or reads a single file from <em class="T2">stdin</em>.</p>
+    <p>The files are processed separately but if the <code>--modify-in-place</code> option is not used they are all written to <em class="T2">stdout</em>.</p>
+    <p>When doing this the <code>--body-only</code> option is useful as it causes the <code>&lt;body&gt;</code> of each input document, if any, to be output as a <code>&lt;div&gt;</code>.</p>
+    <p>Each input file is scanned for <code>&lt;style&gt;</code> elements, which if found are processed against the <code>for_styles:</code> section of the config file, using any resulting conversions in the processing of the current document, in addition to (actually before) the conversions given in the <code>for_elements:</code> section of the config file and any conversions derived from CSS files given with the <code>--css</code> option.</p>
+    <ul>
+      <li>
+        <p>•.WARNING:</p>
+        <p>If the HTML is not UTF-8 encoded you <em class="T2">must</em> pass a filename, as second argument and charset information must be present in the content attribute of a <code>&lt;meta http-equiv=&quot;Content-Type&quot;</code> tag in a possibly incomplete HTML document, which will be looked up using the &quot;two step&quot; algorithm specified by HTML5. It does not look for a BOM. Only the first 1024 bytes of the string are checked.</p>
+      </li>
+    </ul>
+    <p>The modified document will be converted back to HTML and written to <em class="T2">stdout</em> in UTF-8 encoding.</p>
+    <h2>The YAML configuration file</h2>
+    <p>The YAML configuration file should look something like this:</p><pre>---</pre><pre>for_styles:</pre><pre>  # Inline code</pre><pre>  - from:   # Search criteria</pre><pre>      class: '/^T\d+$'          # Leading / indicates regular expression</pre><pre>      font-family: '/Courier'</pre><pre>    to:     # replacement values</pre><pre>      _tag: code</pre><pre>      # Null replacement value: delete the attribute</pre><pre>      class: ~      </pre><pre>  - from:</pre><pre>      class: '/^T\d+$'</pre><pre>      font-style: '/italic'</pre><pre>    to:</pre><pre>      _tag: em</pre><pre>  - from:</pre><pre>      class: '/^T\d+$'</pre><pre>      font-style: '/bold'</pre><pre>    to:</pre><pre>      _tag: strong</pre><pre>  # Block code</pre><pre>  - from:</pre><pre>      margin-top: '/\S'</pre><pre>      font-family: '/Courier'</pre><pre>    to:</pre><pre>      _tag: pre</pre><pre>      class: ~</pre><pre> </pre><pre>for_elements:</pre><pre>  - from:</pre><pre>      _tag: p</pre><pre>    to:</pre><pre>      class: ~</pre><pre>  # Delete A elements without an href attribute</pre><pre>  - from:</pre><pre>      _tag: a</pre><pre>      # Null search value: the attribute must be nonexisting</pre><pre>      href: ~     </pre><pre>    to:</pre><pre>      CALL: delete    # Call a method on the HTML::Element object!</pre><pre>  # Delete classes from header elements</pre><pre>  - from:</pre><pre>      _tag: '/^h[1-6]$'</pre><pre>    to:</pre><pre>      class: ~</pre><p>For the supported subset of YAML syntax see <a href="https://metacpan.org/pod/YAML::Tiny#YAML-TINY-SPECIFICATION">https://metacpan.org/pod/YAML::Tiny#YAML-TINY-SPECIFICATION</a></p>
+    <p>The structure of the configuration file is described below.</p>
+    <h3><code>for_styles:</code> and <code>for_elements:</code></h3>
+    <p>The top level is a mapping with at least one of the keys <code>for_styles:</code> and <code>for_elements</code>, each with a list as value. If the top level is a list it is assigned to <code>for_elements:</code></p>
+    <p>Each of the values of <code>for_styles:</code> and <code>for_elements</code> is a list of mappings with two keys <code>from:</code> (the search criteria) and <code>to:</code> (the replacement values), each with a mapping as value.</p><pre>from:</pre><p>The <code>from:</code> mapping of the <code>for_elements:</code> list items have HTML attribute names as keys and plain strings or strings containing Perl regular expressions, or as explicitly null values specified with <code>~</code>, e.g. <code>href: ~</code>.</p>
+    <h4>Regular expressions</h4>
+    <p>Regular expressions are entered as normal strings and identified as regexes by a leading forward slash and an optional trailing slash followed by regular expression modifier letters: <code>/REGEX/MODIFIERS</code>, e.g. <code>/^P\d+$/i</code> which matches a string consisting of a <code>P</code> or <code>p</code> followed by one or more digits, <code>/^P\d+$/</code> being the format of an automatical paragraph style class in the output of LibreOffice's XHTML exporter. Note that strings containing regular expressions should normally be enclosed in single quotes to prevent that punctuation characters inside them are interpreted as YAML metacharacters.</p>
+    <p>If you are unfamiliar with regular expressions in general or Perl regular expressions in particular you can find increasingly in-depth information with the <code>perldoc</code> command line program:</p><pre>$ perldoc perlrequick</pre><pre> </pre><pre>$ perldoc perlretut</pre><pre> </pre><pre>$ perldoc perlre</pre><p>For the valid trailing modifiers see:</p><pre>$ perldoc -f qr</pre><h4>Element selection</h4>
+    <p>The search criteria select all elements where all the criteria in the <code>from:</code> mapping match the corresponding HTML attributes:</p><pre>from:</pre><pre>    _tag:   span</pre><pre>    class:  '/\bfoo\b/'</pre><p>selects all <code>&lt;span&gt;</code> elements with a class <code>foo</code>. Non-span elements or elements without a <code>foo</code> class are not selected.</p>
+    <p>The following rules apply for attribute value matching:</p>
+    <ul>
+      <li>
+        <p>•.Plain strings</p>
+        <p>Must match exactly, i.e. the attribute value must be that exact string.</p>
+      </li>
+      <li>
+        <p>•.Regular expressions</p>
+        <p>The attribute value must match the regular expression. If you don't want to match a substring use the beginning-of-string and end-of-string anchors <code>^</code> and <code>$</code>.</p>
+      </li>
+      <li>
+        <p>•.Null search criterion values</p>
+        <p>The attribute must not be present in the element; thus <code>href: ~</code> will match elements without any <code>href</code> attribute.</p>
+        <p>Note that there is a subtle difference between an null value and an empty string as search criterion values: the empty string will select elements where the value of the attribute in question <em class="T2">is</em> an empty string, while an null value will select elements where the attribute in question is missing.</p>
+      </li>
+      <li>
+        <p>•.The key <code>_tag:</code></p>
+        <p>The search criterion key <code>_tag:</code>, with a leading underscore, matches the <em class="T2">element name</em> rather than an attribute. Thus <code>_tag: span</code> will select <code>&lt;span&gt;</code> elements.</p>
+      </li>
+      <li>
+        <p>•.Classes</p>
+        <p>Remember that classes are stored in a single string separated by whitespace. To match a single class enclose use a regular expressionand enclose the class name with <code>\b</code> anchors, or if the element should have only a single class with <code>^</code> and <code>$</code> anchors.</p>
+      </li>
+    </ul>
+    <h4>In <code>for_styles:</code></h4>
+    <p>The <code>from:</code> mappings of the <code>for_styles:</code> section are similar, except that</p>
+    <ol>
+      <li>
+        <p>You can use CSS attribute names and values as search criteria. Thus for example <code>font-family: '/Courier'</code> will match elements to which a style rule specifying Courier or Courier New as font-family apply.</p>
+      </li>
+      <li>
+        <p>The only HTML attributes you can match are <code>id</code>, <code>class</code> and the element-name 'attribute' <code>_tag</code>, namely as inferred from the CSS selectors, which are matched against the following regular expressions:</p><pre>_tag  : /(?&lt;!\S)([-\w]+)/</pre><pre>id    : /\#([-\w]+)/</pre><pre>class : /\.([-\w]+)/</pre></li>
+    </ol>
+    <ul>
+      <li>
+        <p>•.NOTE:</p>
+        <p>Style matching works by matching the <code>from:</code> criteria of the <code>for_styles</code> section against CSS style rules embedded in the HTML document and constructing <code>for_elements</code> criteria based on their selectors.</p>
+        <p>Child selectors like <code>p.foo span.bar</code> do not work. Such rules are simply ignored. Comma-separated selectors like <code>p.foo, span.bar</code> <em class="T2">do</em> work, but all other selectors containing whitespace are ignored.</p>
+      </li>
+    </ul><pre>to:</pre><p><code>to:</code> mappings simply specify string attribute values which should replace the old attribute values -- or the element name; the <code>_tag</code> 'attribute' is supported! A null value delete the attribute, so <code>class: ~</code> will remove the <code>class</code> attribute.</p>
+    <h4>For Perl users</h4>
+    <p>There is one possible key which does not just set an attribute string value, distinguished by being uppercase:</p>
+    <ul>
+      <li><pre>•.CALL:</pre><p>A list of lists, where the first item of the inner lists should be the name of an <a href="https://metacpan.org/pod/HTML::Element">HTML::Element</a> method to call on the object representing the element and the following items are arguments to the method if any.</p>
+        <p>As a special shortcut you can give a single method name like <code>CALL: delete</code> instead of a list of lists.</p>
+        <p>Please note that this feature has not been extensively tested: the only forms I have ever actually used are <code>CALL: delete</code> and <code>CALL: replace_with_content</code>! These are arguably the most useful ones.</p>
+      </li>
+    </ul>
+    <h1>AUTHOR</h1>
+    <p>Benct Philip Jonsson <a href="mailto:bpjonsson@gmail.com">bpjonsson@gmail.com</a></p>
+    <h1>COPYRIGHT</h1>
+    <p>Copyright 2015- Benct Philip Jonsson</p>
+    <h1>LICENSE</h1>
+    <p>This program is free software; you can redistribute it and/or modify it under the same terms as Perl itself.</p>
+  </body> </html>
