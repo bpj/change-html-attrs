@@ -5,3 +5,5 @@ Session*.vim
 untracked/**
 # Documentation source
 doc.pdc
+pod.xhtml
+tidy.xhtml
