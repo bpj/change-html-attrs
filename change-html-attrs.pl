@@ -15,7 +15,21 @@ use open ':std';
 
 # use autodie 2.12;
 
-# use Data::Dump qw[ddx];
+use subs qw[ dbg ];
+
+use constant DEBUG => $ENV{"PERL_CHG_HTML_ATTRS"};
+if ( DEBUG ) {
+    eval <<'...';
+    use Data::Dump qw[pp];
+    sub dbg {
+        my(undef, $file, $line) = caller;
+        $file =~ s,.*[\\/],,;
+        my $out = "$file:$line: " . pp(@_) . "\n";
+        $out =~ s/^/# /gm;
+        print STDERR $out;
+    }
+...
+}
 
 use CSS::Tiny;
 use Carp;
@@ -66,7 +80,7 @@ my @opt_specs = (                               # {{{1}}}
     'config|yaml|c|y=s',
     'css|C=s@',
     'body_only|body-only|b',
-    'modify_in_place|modify-in-place|i',
+    'modify_in_place|modify-in-place|i:s',
     'stdout|s',
     'help|h',
     'man|m',
@@ -84,7 +98,7 @@ unless ( caller ) {    # Run as program          # {{{1}}}
       or pod2usage( -msg => 'Error getting options!', -verbose => 1, -exitval => 2 );
     $opt{man}  and pod2usage( -verbose => 2, -exitval => 0 );
     $opt{help} and pod2usage( -verbose => 1, -exitval => 0 );
-    $opt{stdout} = 1 unless $opt{modify_in_place};
+    $opt{stdout} = 1 unless exists $opt{modify_in_place};
     __PACKAGE__->process( \%opt, @ARGV );
 } ## end unless ( caller )
 
@@ -257,7 +271,7 @@ sub process_file {                              # {{{1}}}
         my $in_place = exists $self->{modify_in_place};
         if ( $in_place ) {
             my $bak = $file . $self->{modify_in_place};
-            copy( $file, $bak );
+            copy( $file, $bak ) if $bak ne $file;
         }
         my $tree = $self->get_tree($file);
         $self->change($tree);
@@ -363,6 +377,14 @@ sub dump_html {                                 # {{{1}}}
     if ( $body_only and my $body = $tree->look_down( _tag => 'body' ) ) {
         $tree = $body->clone;
         $tree->tag( 'div' );
+    }
+    elsif ( my $content_type = $tree->look_down( 
+            _tag => 'meta', 'http-equiv' => "Content-Type",
+            content => qr/\bcharset=(?!utf-8\b)/,
+        ) ) {
+        my $content = $content_type->attr( 'content' );
+        $content =~ s/(?<=\bcharset=)[^;\s]+/utf-8/;
+        $content_type->attr( 'content' => $content );
     }
     my $html = $tree->as_HTML( '<>&"', "\N{SPACE}\N{SPACE}", +{} );
     print STDOUT $html if $stdout;
