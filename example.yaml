@@ -87,4 +87,21 @@ for_elements:
       href: ~     
     to:
       CALL: delete    # Call a method on the HTML::Element object!
+  # Delete document identity stuff, since we've been mucking with the document!
+  - from:
+      _tag: link
+      rel: '/DC'
+    to:
+      CALL: delete
+  - from:
+      _tag: meta
+      name: '/DCTERMS'
+    to:
+      CALL: delete
+  - from:
+      _tag: head
+    to:
+      profile: ~
+
+
 
