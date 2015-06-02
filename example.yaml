@@ -16,11 +16,13 @@ for_styles:
       font-style: '/italic'
     to:
       _tag: em
+      class: ~
   - from:
       class: '/^T\d+$'
       font-style: '/bold'
     to:
       _tag: strong
+      class: ~
   # Block code
   - from:
       margin-top: '/\S'
