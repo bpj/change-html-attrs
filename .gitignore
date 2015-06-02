@@ -1,0 +1,7 @@
+# Vim swap files
+*.sw[pon]
+# Vim session files
+Session*.vim
+untracked/**
+# Documentation source
+doc.pdc
