@@ -35,7 +35,12 @@ for_styles:
 #################
 
 for_elements:
-  # Make the HTML more readable
+  # Get rid of nasty LO style element!
+  - from:
+      _tag: style
+    to:
+      CALL: delete
+  # Delete style attributes
   - from:
       _tag: '/\S'
     to:
@@ -75,6 +80,7 @@ for_elements:
       class: Numbering_20_Symbols    
     to:
       CALL: delete    # Call  # Delete A elements without an href attribute
+  # Delete old-style empty anchors (in headers, with pandoc, they end up as empty spans breaking LaTeX!)
   - from:
       _tag: a
       # Undefined search value: the attribute must be nonexisting
